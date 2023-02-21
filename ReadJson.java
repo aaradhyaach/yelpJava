@@ -16,6 +16,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class ReadJson implements ActionListener {
@@ -103,14 +105,40 @@ public class ReadJson implements ActionListener {
         for (Object obj : jsonArray) {
             JSONObject jsonObject = (JSONObject) obj;
             Business business = gson.fromJson(jsonObject.toJSONString(), Business.class);
-            List<String> myList = new ArrayList<String>(List.of(business.categories.split(", ")));
-            hashTableOne.setValue(business.name, myList);
-            hashTableTwo.add(myList);
+            hashTableOne.setValue(business.name, business.categories);
+            hashTableTwo.add(business.categories);
         }
-        Object gsonObj = hashTableOne.getValue(input);
-        hashTableOne.remove(input);
+        String userInput = input;
+        Object gsonObj = hashTableOne.getValue(userInput);
+        hashTableTwo.remove(input);
+
+        if (gsonObj == null) {
+            label1.setText("Invalid Business!");
+            label2.setText("Invalid Business!");
+
+        }
+        tfIdfCalculator calculator = new tfIdfCalculator();
+        List<List<String>> documents = new ArrayList<>();
+
+        String[] queryString = gsonObj.toString().split(", ");
+        List<String> inputList = Arrays.asList(queryString);
+
+        List<String> nextList = null;
         for (Object obj : jsonArray) {
-            System.out.println(input);
+            JSONObject jsonObject = (JSONObject) obj;
+            Business business = gson.fromJson(jsonObject.toJSONString(), Business.class);
+            nextList = Arrays.asList(business.categories.split(", "));
+            documents.add(nextList);
+
+        }
+
+        for (int j = 0; j < documents.size(); j++) {
+            for (int i = 0; i < inputList.size(); i++) {
+                double tfIdf = calculator.tfIdf(inputList, documents, inputList.get(i));
+                System.out.println("category  " + documents.get(j));
+                System.out.println("inp  " + inputList.get(i));
+                System.out.println(tfIdf);
+            }
         }
     }
 }
