@@ -9,6 +9,9 @@ import com.google.gson.reflect.TypeToken;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class readJSONFile {
 
@@ -43,11 +46,12 @@ public class readJSONFile {
         //user inputs for example
         String userInput = "Perkiomen Valley Brewery";
 
-        //find user input in hashTableOne(name->GSON) then assign GSON as the key to hashTableTwo(GSON -> TFIDF)
+        //find user input in hashTableOne(name->GSON) then get categories and convert it to arraylist
         Object gsonObj = hashTableOne.getValue(userInput);
         String category = ((Business) gsonObj).categories;
-        System.out.print(category);
+        ArrayList<String> categoriesList = new ArrayList<String>(List.of(category.split(", ")));
 
+        //loop through each element of the arraylist, calculate and add tf-idf to hashTableTwo(GSON->tf-idf)
 
 
 //        hashTableOne.printAll();
