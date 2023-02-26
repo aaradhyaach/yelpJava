@@ -108,9 +108,10 @@ public class ReadJson implements ActionListener {
             hashTableOne.setValue(business.name, business.categories);
             hashTableTwo.add(business.categories);
         }
+
         String userInput = input;
         Object gsonObj = hashTableOne.getValue(userInput);
-        hashTableTwo.remove(input);
+
 
         if (gsonObj == null) {
             label1.setText("Invalid Business!");
@@ -119,26 +120,32 @@ public class ReadJson implements ActionListener {
         }
         tfIdfCalculator calculator = new tfIdfCalculator();
         List<List<String>> documents = new ArrayList<>();
+        List<List<String>> docs = new ArrayList<>();
+
+        hashTableOne.remove(input);
+        hashTableTwo.remove(gsonObj);
 
         String[] queryString = gsonObj.toString().split(", ");
-        List<String> inputList = Arrays.asList(queryString);
+        List<String> inputList = Arrays.asList(queryString);  //categories of input business
 
         List<String> nextList = null;
         for (Object obj : jsonArray) {
             JSONObject jsonObject = (JSONObject) obj;
             Business business = gson.fromJson(jsonObject.toJSONString(), Business.class);
             nextList = Arrays.asList(business.categories.split(", "));
-            documents.add(nextList);
+            documents.add(nextList); //add all business categories
 
         }
 
         for (int j = 0; j < documents.size(); j++) {
+            double k = 0;
             for (int i = 0; i < inputList.size(); i++) {
-                double tfIdf = calculator.tfIdf(inputList, documents, inputList.get(i));
-                System.out.println("category  " + documents.get(j));
-                System.out.println("inp  " + inputList.get(i));
-                System.out.println(tfIdf);
+                double tfIdf = calculator.tfIdf(documents.get(j), documents, inputList.get(i));
+                k = k + tfIdf;
             }
+            String doc = String.valueOf(documents.get(j));
+            String category = doc.substring(1, doc.length() - 1);  //get rid of brackets
+            hashTableTwo.setValue(category, k);
         }
     }
 }
